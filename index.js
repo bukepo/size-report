@@ -46,32 +46,32 @@ function sign(n) {
 
   router.get('/:installationId/bash', async (req, res) => {
     res.sendFile('bash', {
-      root: path.join(__dirname, 'public'),
+      root: path.join(__dirname, 'public')
     })
   })
 
   router.post('/:installationId/review', async (req, res) => {
     const github = await app.auth(req.params.installationId)
     let response = await github.issues.listComments({
-      "number": req.body.number,
-      "owner": req.body.owner,
-      "repo": req.body.repo,
-    });
+      number: req.body.number,
+      owner: req.body.owner,
+      repo: req.body.repo
+    })
 
-    let params = {
-        "number": req.body.number,
-        "owner": req.body.owner,
-        "repo": req.body.repo,
-        "body": render(req.body)
+    const params = {
+      number: req.body.number,
+      owner: req.body.owner,
+      repo: req.body.repo,
+      body: render(req.body)
     }
 
-    let comment = response.data.find(review => review.user.login == 'size-report[bot]')
+    const comment = response.data.find(review => review.user.login === 'size-report[bot]')
 
     if (comment) {
-      params.comment_id = comment.id;
-      response = await github.issues.updateComment(params);
+      params.comment_id = comment.id
+      response = await github.issues.updateComment(params)
     } else {
-      response = await github.issues.createComment(params);
+      response = await github.issues.createComment(params)
     }
 
     return res.sendStatus(response.status)
